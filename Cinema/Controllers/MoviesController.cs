@@ -1,5 +1,7 @@
-﻿using Cinema.DTOs;
+﻿using Cinema.Authentication;
+using Cinema.DTOs;
 using Cinema.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema.Controllers
@@ -36,6 +38,13 @@ namespace Cinema.Controllers
         public List<MovieDTO> GetMoviesByViews()
         {
             return movieService.GetMoviesByViews();
+        }
+
+        [Authorize(Roles = UserRoles.Admin)]
+        [HttpDelete("/movie/{id}")]
+        public MovieDTO DeleteMovieById(Guid id)
+        {
+            return movieService.DeleteMovieById(id);
         }
 
     }

@@ -1,5 +1,7 @@
-﻿using Cinema.DTOs;
+﻿using Cinema.Authentication;
+using Cinema.DTOs;
 using Cinema.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +43,7 @@ namespace Cinema.Controllers
             return actorService.GetActorsByWealth();
         }
 
+        [Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("/actor/{id}")]
         public ActorDTO DeleteActorById(Guid id)
         {

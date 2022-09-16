@@ -46,6 +46,18 @@ namespace Cinema.Repositories.Impl
             return movieEntity;
         }
 
+        public MovieEntity DeleteMovieById(Guid id)
+        {
+            MovieEntity movie = cinemaContext.Movies.Find(id);
+
+            //Add an Exception Here
+            if (movie == null) return null;
+
+
+            cinemaContext.Movies.Remove(movie);
+            cinemaContext.SaveChanges();
+            return movie;
+        }
 
 
         public void AddActorToMovie(ActorMovieEntity actorMovieEntity)

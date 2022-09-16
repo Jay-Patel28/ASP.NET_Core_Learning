@@ -1,4 +1,5 @@
 using AutoMapper;
+using Cinema.Authentication;
 using Cinema.Caching;
 using Cinema.Controllers;
 using Cinema.DataContext;
@@ -11,7 +12,12 @@ using Cinema.Models;
 using Cinema.Repositories;
 using Cinema.Repositories.Impl;
 using Cinema.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +28,33 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 string dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<CinemaContext>(options => options.UseSqlServer(dbConnectionString));
+
+builder.Services.AddDbContext<CinemaContext>
+    (options => options.UseSqlServer(dbConnectionString));
+
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<CinemaContext>()
+                .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+    };
+});
 
 MapperConfiguration mapperConfig = new MapperConfiguration(mc =>
 {
@@ -83,6 +115,7 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler("/api/error");
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
