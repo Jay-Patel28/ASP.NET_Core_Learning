@@ -13,6 +13,7 @@ namespace Cinema.Repositories
 
         public void AddActorToMovie(ActorMovieEntity actorMovieEntity);
         public List<MovieEntity> GetMoviesByViews();
+        public MovieEntity DeleteMovieById(Guid id);
 
         public void Save();
         //public ActorEntity DeleteActorById(Guid id);

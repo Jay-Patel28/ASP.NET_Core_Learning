@@ -65,6 +65,17 @@ namespace Cinema.Managers
             return Movie;
         }
 
+
+        public MovieModel DeleteMovieById(Guid id)
+        {
+            inMemoryCache.Remove(MOVIE + id.ToString());
+            MovieModel movieModel = mapper.Map<MovieModel>(movieRepository.DeleteMovieById(id));
+            if (movieModel == null)
+            {
+                throw new BadRequestException("Movie.not.found", string.Format("Did not find any Movie with id {0}", id.ToString()));
+            }
+            return movieModel;
+        }
         //public List<ActorEntity> GetActorsByMovieId(Guid movieId)
         //{
         //    List<ActorMovie> actors = movieRepository.GetaActorsByMovieId(Guid movieId);

@@ -50,5 +50,10 @@ namespace Cinema.Services
             movieModel.ActorModels = actorModel;
             return mapper.Map<MovieDTO>(movieManager.AddMovie(movieModel));
         }
+        public MovieDTO DeleteMovieById(Guid id)
+        {
+            MovieModel movieModel = movieManager.DeleteMovieById(id);
+            return mapper.Map<MovieDTO>(movieModel);
+        }
     }
 }

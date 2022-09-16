@@ -1,11 +1,13 @@
-﻿using Cinema.Entities;
+﻿using Cinema.Authentication;
+using Cinema.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.DataContext
 {
-    public class CinemaContext : DbContext
+    public class CinemaContext : IdentityDbContext<ApplicationUser>
     {
-        public CinemaContext(DbContextOptions options) : base(options)
+        public CinemaContext(DbContextOptions<CinemaContext> options) : base(options)
         {
 
         }
@@ -26,6 +28,7 @@ namespace Cinema.DataContext
             modelBuilder.Entity<ActorEntity>().HasIndex(actor => actor.wealth);
             modelBuilder.Entity<MovieEntity>().HasIndex(movie => movie.TotalViews);
 
+            base.OnModelCreating(modelBuilder);  
     }
     }
 
