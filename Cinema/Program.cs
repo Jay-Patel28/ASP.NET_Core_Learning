@@ -2,6 +2,7 @@ using AutoMapper;
 using Cinema.Authentication;
 using Cinema.Caching;
 using Cinema.Controllers;
+using Cinema.Cosmos;
 using Cinema.DataContext;
 using Cinema.DTOs;
 using Cinema.Entities;
@@ -55,6 +56,22 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
+
+async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+{
+    var databaseName = configurationSection["DatabaseName"];
+    var containerName = configurationSection["ContainerName"];
+    var account = configurationSection["Account"];
+    var key = configurationSection["Key"];
+    var client = new Microsoft.Azure.Cosmos.CosmosClient(account, key);
+    var database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+    await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+    var cosmosDbService = new CosmosDbService(client, databaseName, containerName);
+    return cosmosDbService;
+}
+
+builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(builder.Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+
 
 MapperConfiguration mapperConfig = new MapperConfiguration(mc =>
 {
