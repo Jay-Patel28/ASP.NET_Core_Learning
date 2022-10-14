@@ -43,7 +43,7 @@ namespace Cinema.Controllers
             return actorService.GetActorsByWealth();
         }
 
-        [Authorize(Roles = UserRoles.Admin)]
+        //[Authorize(Roles = UserRoles.Admin)]
         [HttpDelete("/actor/{id}")]
         public ActorDTO DeleteActorById(Guid id)
         {

@@ -58,7 +58,7 @@ namespace Cinema.Managers
                     movieModel.ActorModels.Add(mapper.Map<ActorModel>(actorMovieEntity.ActorEntity));
                 }
 
-                inMemoryCache.Set(MOVIE + id.ToString(), movieModel);
+                //inMemoryCache.Set(MOVIE + id.ToString(), movieModel);
                 return (movieModel);
             }
             MovieModel? Movie = JsonConvert.DeserializeObject<MovieModel>(MOVIE_BY_ID);
@@ -68,6 +68,12 @@ namespace Cinema.Managers
 
         public MovieModel DeleteMovieById(Guid id)
         {
+            int actorCount = movieRepository.GetActorsCount(id);
+            if(actorCount > 0)
+            {
+                throw new BadRequestException("Movie has actors.", "Delete the actors of this movie first.");
+            }
+            inMemoryCache.Remove(ALL_MOVIES);
             inMemoryCache.Remove(MOVIE + id.ToString());
             MovieModel movieModel = mapper.Map<MovieModel>(movieRepository.DeleteMovieById(id));
             if (movieModel == null)
@@ -104,5 +110,11 @@ namespace Cinema.Managers
             movieRepository.Save();
             return mapper.Map<MovieModel>(movie);
         }
+
+        public void RemoveActorFromMovie(Guid movieId, Guid actorId)
+        {
+            movieRepository.RemoveActorFromMovie( movieId,  actorId);
+        }
+
     }
 }

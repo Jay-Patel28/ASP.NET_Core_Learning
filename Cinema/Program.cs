@@ -15,6 +15,7 @@ using Cinema.Repositories.Impl;
 using Cinema.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
@@ -70,13 +71,14 @@ async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSe
     return cosmosDbService;
 }
 
-builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(builder.Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+//builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(builder.Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
 
 
 MapperConfiguration mapperConfig = new MapperConfiguration(mc =>
 {
     mc.CreateMap<ActorModel, ActorEntity>();
-    mc.CreateMap<ActorEntity, ActorModel>();
+    mc.CreateMap<ActorEntity, ActorModel>()
+    .ForMember(des => des.ActorId, opt => opt.MapFrom(sr=> sr.Id));
 
     mc.CreateMap<ActorModel, ActorDTO>();
     mc.CreateMap<ActorDTO, ActorModel>();
@@ -105,15 +107,16 @@ builder.Services.AddScoped<MovieManager>();
 builder.Services.AddScoped<ActorService>();
 builder.Services.AddScoped<MovieService>();
 
-//builder.Services.AddMemoryCache();
-//builder.Services.AddSingleton<ICaching, InMemoryCache>();
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = builder.Configuration.GetConnectionString("CinemaRedisConStr");
-    options.InstanceName = "DB0";
-});
-builder.Services.AddSingleton<ICaching, RedisCache>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICaching, InMemoryCache>();
+builder.Services.AddCors(); // Make sure you call this previous to AddMvc
+builder.Services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+//builder.Services.AddStackExchangeRedisCache(options =>
+//{
+//    options.Configuration = builder.Configuration.GetConnectionString("CinemaRedisConStr");
+//    options.InstanceName = "DB0";
+//});
+//builder.Services.AddSingleton<ICaching, RedisCache>();
 
 builder.Services.AddControllers(options =>
 {
@@ -124,6 +127,9 @@ builder.Services.AddControllers(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCors(
+       options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+   );
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

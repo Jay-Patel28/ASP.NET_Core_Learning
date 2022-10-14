@@ -38,7 +38,8 @@ namespace Cinema.Managers
                 inMemoryCache.Set(ALL_ACTORS, actorEntity);
                 return mapper.Map<List<ActorModel>>(actorEntity);
             }
-            List<ActorModel>? Actors = JsonConvert.DeserializeObject<List<ActorModel>>(ALL);
+            List<ActorEntity>? ActorsEntity = JsonConvert.DeserializeObject<List<ActorEntity>>(ALL);
+            List<ActorModel> Actors = mapper.Map<List<ActorModel>>(ActorsEntity);
             return Actors;
         }
 
@@ -65,6 +66,7 @@ namespace Cinema.Managers
 
         public ActorModel DeleteActorById(Guid id)
         {
+            inMemoryCache.Remove(ALL_ACTORS);
             inMemoryCache.Remove(ACTOR+id.ToString());
             ActorModel actorModel = mapper.Map<ActorModel>(actorRepository.DeleteActorById(id));
             if (actorModel == null)

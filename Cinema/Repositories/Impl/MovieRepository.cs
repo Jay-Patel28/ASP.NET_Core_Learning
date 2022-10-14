@@ -1,5 +1,6 @@
 ﻿using Cinema.DataContext;
 using Cinema.Entities;
+using Cinema.Managers;
 using Cinema.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,6 +60,10 @@ namespace Cinema.Repositories.Impl
             return movie;
         }
 
+        public int GetActorsCount(Guid id)
+        {
+           return cinemaContext.ActorsOfMovie.Count(x => x.RelatedMovieId == id);
+        }
 
         public void AddActorToMovie(ActorMovieEntity actorMovieEntity)
         {
@@ -67,6 +72,13 @@ namespace Cinema.Repositories.Impl
 
         public void Save()
         {
+            cinemaContext.SaveChanges();
+        }
+
+        public void RemoveActorFromMovie(Guid movieId, Guid actorId)
+        {
+            ActorMovieEntity? ame = cinemaContext.ActorsOfMovie.Where(x => x.RelatedMovieId == movieId && x.RelatedActorId == actorId).FirstOrDefault();
+            cinemaContext.ActorsOfMovie.Remove(ame);
             cinemaContext.SaveChanges();
         }
 
