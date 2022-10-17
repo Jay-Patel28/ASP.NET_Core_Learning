@@ -6,6 +6,7 @@ using Cinema.Exceptions;
 using Cinema.Models;
 using Cinema.Repositories;
 using Cinema.Repositories.Impl;
+using Cinema.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Security.Cryptography.X509Certificates;
@@ -114,6 +115,18 @@ namespace Cinema.Managers
         public void RemoveActorFromMovie(Guid movieId, Guid actorId)
         {
             movieRepository.RemoveActorFromMovie( movieId,  actorId);
+        }
+
+        public void AddActorToMovie(Guid movieId, Guid actorId)
+        {
+            movieRepository.AddActorToMovie(new ActorMovieEntity
+            {
+                RelatedActorId = actorId,
+                RelatedMovieId = movieId
+            }
+            );
+
+            movieRepository.Save();
         }
 
     }

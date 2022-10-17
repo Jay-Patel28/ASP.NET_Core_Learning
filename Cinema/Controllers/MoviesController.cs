@@ -70,5 +70,11 @@ namespace Cinema.Controllers
             movieService.RemoveActorFromMovie( movieId,  actorId);
         }
 
+        [HttpPost("/movie/{movieId}/actor/{actorId}")]
+        public void AddActorToMovie(Guid movieId, Guid actorId)
+        {
+            movieService.AddActorToMovie(movieId, actorId);
+        }
+
     }
 }

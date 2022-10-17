@@ -61,5 +61,10 @@ namespace Cinema.Services
             movieManager.RemoveActorFromMovie(movieId, actorId);
         }
 
+        public void AddActorToMovie(Guid movieId, Guid actorId)
+        {
+            movieManager.AddActorToMovie(movieId, actorId);
+        }
+
     }
 }
