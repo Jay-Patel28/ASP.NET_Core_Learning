@@ -18,7 +18,6 @@ namespace Cinema.Repositories
         public int GetActorsCount(Guid id);
 
         public void RemoveActorFromMovie(Guid movieId, Guid actorId);
-
         public void Save();
         //public ActorEntity DeleteActorById(Guid id);
     }
